@@ -1,0 +1,12 @@
+Introduction:
+(...)
+
+étape descriptive des données:
+-tout d'abord on veut la forme des données avant de faire de faire des transformations
+-c'est pas grave que tout ne soit pas normal (par exemple c'est pas grave que les coordonnées ne soient pas normal, (log normal))
+
+résultats:
+-tableau, peut être box-blot
+-nuage de point (corrélation)
+
+peut être un section test.t:
