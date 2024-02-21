@@ -10,3 +10,6 @@ résultats:
 -nuage de point (corrélation)
 
 peut être un section test.t:
+------------------------------------
+Selon galiane, on fait des statistiques descriptives, vérifier la variance si on peut faire un t.test, une transformation de variable, un test de permutations.
+Pas d'ANOVA, régression.
