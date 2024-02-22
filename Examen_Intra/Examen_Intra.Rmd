@@ -6,7 +6,8 @@ output: html_document
 ---
 
 ```{r}
-load("C:/Users/kf891141/Desktop/Stats-Syntese/Examen_Intra")
+load("C:/Users/kf891141/Desktop/Stats-Syntese/Examen_Intra/Mandragore_1.RData")
+load("C:/Users/kf891141/Desktop/Stats-Syntese/Examen_Intra/Mandragore_2.RData")
 ```
 
 
