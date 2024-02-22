@@ -32,3 +32,25 @@ View(case0601)
 View(case0602)
 View(case0701)
 View(case0702)
+
+dim(case0501)
+summary(case0501)
+install.packages("psych")
+library(psych)
+psych::describeBy(case0501$Lifetime, group = case0501$Diet)
+psych::describe(case0501$Lifetime)
+attach(case0501)
+
+case0501
+levels(Diet)
+
+install.packages("ggstatsplot")
+
+ggstatsplot::ggbetweenstats(
+  data = case0301, x = Diet, y = Lifetime,
+  title = "Lifetime ~ Diet",
+  mean.ci = TRUE,
+  type="p",
+  var.equal = TRUE,
+  bf.message = FALSE,
+)
