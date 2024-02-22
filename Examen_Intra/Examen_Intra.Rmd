@@ -5,6 +5,12 @@ date: "2024-02-22"
 output: html_document
 ---
 
+```{r}
+load("C:/Users/kf891141/Desktop/Stats-Syntese/Examen_Intra")
+```
+
+
+
 Chargement des librairy
 ```{r}
 library(psych)
@@ -24,8 +30,8 @@ Sortie: Hemisphere = {Sud, Nord}
 
 Petite visualisation des données
 ```{r}
-View(Mandragore1)
-summary(Mandragore1)
+View(Mandragore_1)
+summary(Mandragore_1)
 ```
 
 
@@ -65,11 +71,12 @@ var.equal = TRUE,
 bf.message = FALSE,
 )
 ```
+
 ```{r}
 psych::describeBy(Hauteur, group = Hemisphere)
 ```
 
-La répartition des données est bien meilleure (visuellement). Les variances semblent être plus égales, malgré quelques valeures extrêmes pour l'hémisphère Nord et une valeure extrême pour l'hémisphère Sud. Vu que nous avons déjà fait une transformation logarithmique et que celle-ci est résistante aux valeurs extrêmes, nous allons garder les dites valeurs.
+La répartition des données est bien meilleure (visuellement). Les variances semblent être plus égales, malgré quelques valeurs extrêmes pour l'hémisphère Nord et une valeur extrême pour l'hémisphère Sud. Vu que nous avons déjà fait une transformation logarithmique et que celle-ci est résistante aux valeurs extrêmes, nous allons garder les dites valeurs.
 
 Vu que les variances sont à peu près égales, que le nombre d'observations égaux pour les 2 hémisphères. Nous allons faire un test t pour vérifier si la croissance de la plante est influencée par l'hémisphère, ou en d'autres mots, si l'on doit rejeté l'hyphothèse nulle $H_0: \mu_{Nord} = \mu_{Sud}$ vs $H_0: \mu_{Nord} \neq \mu_{Sud}$. Et l'on va prendre un risque de première espèce $\alpha = 0.05$.
 ```{r}
@@ -95,10 +102,9 @@ bf.message = FALSE,
 )
 ```
 
-La variance ne semble pas très différente (même s'il y plus de valeures extrêmes au Sud). En plus la médiane semble presque égale, pareil pour la moyenne. Pour améliorer les variances des 2 groupes, éliminons les valeurs en dessous de 15 feuilles.
+La variance ne semble pas très différente (même s'il y plus de valeurs extrêmes au Sud). En plus la médiane semble presque égale, pareil pour la moyenne. Pour améliorer les variances des 2 groupes, éliminons les valeurs en dessous de 15 feuilles.
 ```{r}
 which(Mandragore_1$Feuilles < 15)
-}
 ```
 
 On enlève ces données
@@ -133,52 +139,88 @@ Donc avec les 2 comparaisons, c'est-à-dire le nombre de feuilles et la hauteur 
 Si la chercheuse voulait tenter de montrer un effet. Elle pourrait comparer le temps de croissance jusqu'à maturité entre les plans au Sud comparé au Nord
 
 
+# Question 2
+
+```{r}
+View(Mandragore_2)
+attach(Mandragore_2)
+```
+Sortie: Id = {1 à 15}
+        SansEngrais = {qté}
+        AvecEngrais = {qté}
+
+## (i) Est-ce que le ZIK a un effet sur la croissance de la Mandragore?
+
+Tout d'abord, faisons une visulatisation numérique des données
+```{r}
+summary(Mandragore_2)
+```
 
 
 
 
+Regardons numériquement les données:
+```{r}
+psych::describe(AvecEngrais)
+psych::describe(SansEngrais)
+```
+On voit que les données montre un écart-type assez proche. Par contre, le min de "avec engrais" est négatif et il y a en effet une valeur négative. Vu qu'il est impossible qu'un plan est un poids négatif et vu que nous n'avons pas d'instruction de quoi faire en cas de valeur négative dans nos données, nous allons retiré ce poids.
+
+```{r}
+which(Mandragore_2$AvecEngrais <0)
+```
+```{r}
+Mandragore_2b <- Mandragore_2[-c(8),]
+which((Mandragore_2b$AvecEngrais < 0))
+```
+
+Bien qu'il soit pertinent de garder l'Id, vu que chaque plante est identique génétiquement, nous allons ignorer cette variable et ajouter une variable poids. Et inventer une variables Engrais (1= avec, 0 = sans). Nous allons faire cela pour pouvoir comparer nos variance
+
+```{r}
+length(Id)
+```
 
 
+```{r}
+Poids <- rep(NA, 2*15-2)
+Engrais <- rep(NA, 2*15-2)
+for(i in 1:14){
+  Poids[i] <- Mandragore_2b$SansEngrais[i]
+  Engrais[i] <- 0
+}
+
+for(i in 1:14){
+  Poids[i+length(Id)-1] <- Mandragore_2b$AvecEngrais[i]
+  Engrais[i+length(Id)-1] <- 1
+}
+```
+
+Maintenant on fait une description numérique pour notre variable poids en fonction de l'engrais:
+```{r}
+psych::describeBy(Poids, group = Engrais)
+```
+On voit un écart-type quasi exacte (1.88 vs 1.87), par contre les minimum de chacun sont assez différent.
 
 
+Maintenant on fait un graphique:
+```{r}
+boxplot(Poids ~ Engrais, col = "lightcyan2")
+stripchart(Poids ~ Engrais, vertical = TRUE,
+method = "jitter", add = TRUE, pch = 20, cex=2.2,col = 'red')
+```
 
+Les variances semblent être semblable (ce qui était confirmé numériquement). Il est par contre difficile de trouver une différence quelconque avec ces 2 boxplot. Vu que les variance sont semblables, faisons un test t de student pour vérifier si la moyenne des poids est égale selon l'engrais (hypothèse nulle) contre si les moyennes sont différentes. Nous allons prendre un risque de première espèce ($\alpha$) de 5%
+```{r}
+t.test(Poids ~ Engrais, var.equal = TRUE)
+```
+La p-valeur du test t est de 0.5375. Qui est bien au-dessus de 5%. Donc nous ne pouvons rejeter l'hypothèse nulle qui est que la moyenne des poids avec engrais est égale à la moyenne des poids sans engrais.
 
+## (ii)
 
+Encore une fois, la chercheuse devrait regarder le temps de maturation sous engrais contre sans engrais. Aussi, elle pourrait observer combien d'eau est consommé par les 2 plantes pendant leur cycle de vie. Ce sont des informations pertinentes pour vérifier s'il y a une différence significative entre les 2 groupes.
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+## (iii)
+Premièrement, ne pas ajouter une observation négative, à moins d'expliquer le sens de cette observation négaitve. Ensuite, choisir l'endroit où est cultivé le plans de manière randomisé, car peut-être que cela n'a pas été prise en compte lors de l'expérience initiale et cela peut affecté la croissance du plant (par exemple, plus de soleil à un endroit qu'à un autre endroit). 
 
 
 
