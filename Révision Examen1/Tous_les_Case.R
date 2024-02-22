@@ -45,12 +45,14 @@ case0501
 levels(Diet)
 
 install.packages("ggstatsplot")
-
+head(case0501)
 ggstatsplot::ggbetweenstats(
-  data = case0301, x = Diet, y = Lifetime,
+  data = case0501, x = Diet, y = Lifetime,
   title = "Lifetime ~ Diet",
   mean.ci = TRUE,
   type="p",
   var.equal = TRUE,
   bf.message = FALSE,
 )
+
+
