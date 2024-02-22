@@ -1,0 +1,193 @@
+---
+title: "Examen Intra"
+author: "René Picard"
+date: "2024-02-22"
+output: html_document
+---
+
+Chargement des librairy
+```{r}
+library(psych)
+```
+
+
+# Question 1
+
+Entrée des données
+```{r}
+attach(Mandragore_1)
+```
+Sortie: Hemisphere = {Sud, Nord}
+        Feuilles = {Nombres de feuilles}
+        Hauteur = {Hauteur du plan (en pouces)}
+
+
+Petite visualisation des données
+```{r}
+View(Mandragore1)
+summary(Mandragore1)
+```
+
+
+## (i) Est-ce que la croissance de la plante est influencée par l'hémisphère?
+
+Observons les données de la hauteur par rapport à l'hémisphère (et ensuite du nombre de feuilles par arbre)
+```{r}
+psych::describeBy(Hauteur, group = Hemisphere)#si l'on écrit cette ligne dans la console, la sortie apparait bien, si on l'écrit dans cette cellule, la sortie est très laide...
+```
+Dans la sortie (console), on peut observer des écart-type très proche, donc des variances semblables. Un nombre d'observations égaux.
+
+Regardons un box-plot des données:
+```{r}
+ggstatsplot::ggbetweenstats(
+data = Mandragore_1, x = Hemisphere, y = Hauteur,
+title = "Hauteur ~ Hemisphere",
+mean.ci = TRUE,
+type="p",
+var.equal = TRUE,
+bf.message = FALSE,
+)
+```
+Les données sont très dense entre 0 et 5 pouces de hauteur, avec une certaine dispersion entre 5 et 15 pouces. Essayons une transformation des données. Essayons une transformation logarithmique.
+```{r}
+Mandragore_1$logHauteur <- log(Hauteur)
+attach(Mandragore_1)
+```
+
+Maintenant réessayons le graphique:
+```{r}
+ggstatsplot::ggbetweenstats(
+data = Mandragore_1, x = Hemisphere, y = logHauteur,
+title = "Hauteur ~ Hemisphere",
+mean.ci = TRUE,
+type="p",
+var.equal = TRUE,
+bf.message = FALSE,
+)
+```
+```{r}
+psych::describeBy(Hauteur, group = Hemisphere)
+```
+
+La répartition des données est bien meilleure (visuellement). Les variances semblent être plus égales, malgré quelques valeures extrêmes pour l'hémisphère Nord et une valeure extrême pour l'hémisphère Sud. Vu que nous avons déjà fait une transformation logarithmique et que celle-ci est résistante aux valeurs extrêmes, nous allons garder les dites valeurs.
+
+Vu que les variances sont à peu près égales, que le nombre d'observations égaux pour les 2 hémisphères. Nous allons faire un test t pour vérifier si la croissance de la plante est influencée par l'hémisphère, ou en d'autres mots, si l'on doit rejeté l'hyphothèse nulle $H_0: \mu_{Nord} = \mu_{Sud}$ vs $H_0: \mu_{Nord} \neq \mu_{Sud}$. Et l'on va prendre un risque de première espèce $\alpha = 0.05$.
+```{r}
+t.test(logHauteur ~ Hemisphere,var.equal=T)
+```
+
+Le test de student nous donne une p-valeur de 0.0536, ce qui est plus grand que notre $\alpha = 0.05$. Donc nous ne pouvons rejeter l'hypothèse nulle qui est qu'il n'y a pas de différence entre les moyennes de la croissances des feuilles entre l'hémisphère Nord et l'hémisphère Sud.
+
+Maintenant regardons pour le nombre de feuilles par arbres par rapport à chaque hémisphère
+```{r}
+psych::describeBy(Feuilles, group = Hemisphere)
+```
+L'écart-type semble assez différent, vérifions avec 1 graphique
+
+```{r}
+ggstatsplot::ggbetweenstats(
+data = Mandragore_1, x = Hemisphere, y = Feuilles,
+title = "Feuillesr ~ Hemisphere",
+mean.ci = TRUE,
+type="p",
+var.equal = FALSE,
+bf.message = FALSE,
+)
+```
+
+La variance ne semble pas très différente (même s'il y plus de valeures extrêmes au Sud). En plus la médiane semble presque égale, pareil pour la moyenne. Pour améliorer les variances des 2 groupes, éliminons les valeurs en dessous de 15 feuilles.
+```{r}
+which(Mandragore_1$Feuilles < 15)
+}
+```
+
+On enlève ces données
+```{r}
+Mandragore_1b <- Mandragore_1[-c(126,181,274),]
+which(Mandragore_1b$Feuilles < 15)#vérification
+```
+Donc on revérifie la variance:
+```{r}
+psych::describeBy(Mandragore_1b$Feuilles, group = Mandragore_1b$Hemisphere)
+```
+Numériquement, les variance sont encore très inégales.
+
+On refait le graphique:
+```{r}
+ggstatsplot::ggbetweenstats(
+data = Mandragore_1b, x = Hemisphere, y = Feuilles,
+title = "Feuillesr ~ Hemisphere",
+mean.ci = TRUE,
+type="p",
+var.equal = FALSE,
+bf.message = FALSE,
+)
+```
+
+Les données sont beaucoup mieux répartit et la variances, bien qu'inégale, sont semblable. Nous allons donc prendre le résultat de la p-valeur qui est fait avec le ggstatplots::ggbetweenstats avec $\alpha = 0.05$, pour tester $H_0: \mu_{Nord} = \mu_{Sud}$ vs $H_0: \mu_{Nord} \neq \mu_{Sud}$. Vu que les variances sont inégales, c'est un test de t de Welch qui est fait et nous avons comme p-valeur 0.48 qui est bien au-dessus de $\alpha = 0.05$. Donc on ne rejette pas $H_0$ qui émet l'hypothèse que les moyennes du nombre de feuilles est le même au Sud comme au Nord.
+
+Donc avec les 2 comparaisons, c'est-à-dire le nombre de feuilles et la hauteur des feuilles, on peut conclure qu'il n'y a pas d'effet sur la croissance des plans pour chaque hémisphère.
+
+## (ii)
+
+Si la chercheuse voulait tenter de montrer un effet. Elle pourrait comparer le temps de croissance jusqu'à maturité entre les plans au Sud comparé au Nord
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
