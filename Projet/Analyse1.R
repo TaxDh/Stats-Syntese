@@ -225,64 +225,153 @@ resultat_welch
 ####################################################################################################################
 #Nous somme rendu à la variable StudyTime
 
+psych::describeBy(mG3, group = mStudyTime)
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+#Les variances ont l'air pas mal égale, vérifions visuellement
 
 
 ggstatsplot::ggbetweenstats(
-  data = mathematique, x = Dalc, y = G3,
-  title = "Hauteur ~ Hemisphere",
+  data = mathematique, x = studytime, y = G3,
+  title = "La note finale en fonction du temps de voyage",
   mean.ci = TRUE,
   type="p",
-  var.equal = F,
+  var.equal = T,
   bf.message = FALSE,
 )
+
+#Les variances sont pas mal égale, 
+
+qqnorm(mG3[mStudyTime == 1])
+qqline(mG3[mStudyTime == 1], col = "red")
+
+
+
+
+# Méthode de Bonferroni
+
+# Création de sous-ensembles pour chaque niveau de studytime
+groupe1 <- mG3[mStudyTime == 1]
+groupe2 <- mG3[mStudyTime == 2]
+groupe3 <- mG3[mStudyTime == 3]
+groupe4 <- mG3[mStudyTime == 4]
+
+# Effectuer des tests t pour chaque paire de niveaux de studytime
+p_values <- c(
+  t.test(groupe1, groupe2)$p.value,
+  t.test(groupe1, groupe3)$p.value,
+  t.test(groupe1, groupe4)$p.value,
+  t.test(groupe2, groupe3)$p.value,
+  t.test(groupe2, groupe4)$p.value,
+  t.test(groupe3, groupe4)$p.value
+)
+
+# Ajuster les p-valeurs pour les comparaisons multiples (Bonferroni)
+p_values_adjusted <- p.adjust(p_values, method = "bonferroni")
+
+# Afficher les résultats ajustés
+p_values_adjusted
+
+# p_values_adjusted: [1] 1.000000000 0.241111816 0.902398797 0.007709908 0.279629521 1.000000000
+
+#il semble que le niveau 3 d'étude est différent du niveau 2
+#mais le niveau 1 ne l'est pas du niveau 3.
+#en fait le niveau 2 à une moyenne inférieur au niveau 1...
+
+
+
+
+####-------------------------------####
+#Maintenant portugais
+
+
+psych::describeBy(pG3, group = pStudyTime)
+
+#Les variances ont l'air pas mal égale, vérifions visuellement
+
 
 ggstatsplot::ggbetweenstats(
-  data = mathematique, x = Walc, y = G3,
-  title = "Hauteur ~ Hemisphere",
+  data = mathematique, x = studytime, y = G3,
+  title = "La note finale en fonction du temps de voyage",
   mean.ci = TRUE,
   type="p",
-  var.equal = F,
+  var.equal = T,
   bf.message = FALSE,
 )
 
-ggstatsplot::ggbetweenstats(
-  data = portugais, x = Dalc, y = G3,
-  title = "Hauteur ~ Hemisphere",
-  mean.ci = TRUE,
-  type="p",
-  var.equal = F,
-  bf.message = FALSE,
+#Les variances sont pas mal égale, 
+
+qqnorm(pG3[pStudyTime == 1])
+qqline(pG3[pStudyTime == 1], col = "red")
+
+
+
+groupe1 <- pG3[pStudyTime == 1]
+groupe2 <- pG3[pStudyTime == 2]
+groupe3 <- pG3[pStudyTime == 3]
+groupe4 <- pG3[pStudyTime == 4]
+
+# Effectuer des tests t pour chaque paire de niveaux de studytime
+p_values <- c(
+  t.test(groupe1, groupe2)$p.value,
+  t.test(groupe1, groupe3)$p.value,
+  t.test(groupe1, groupe4)$p.value,
+  t.test(groupe2, groupe3)$p.value,
+  t.test(groupe2, groupe4)$p.value,
+  t.test(groupe3, groupe4)$p.value
 )
 
-ggstatsplot::ggbetweenstats(
-  data = portugais, x = Walc, y = G3,
-  title = "Hauteur ~ Hemisphere",
-  mean.ci = TRUE,
-  type="p",
-  var.equal = F,
-  bf.message = FALSE,
-)
+# Ajuster les p-valeurs pour les comparaisons multiples (Bonferroni)
+p_values_adjusted <- p.adjust(p_values, method = "bonferroni")
 
-psych::describeBy(portugais$G3, group = portugais$Dalc)
-psych::describeBy(portugais$G3, group = portugais$Walc)
+# Afficher les résultats ajustés
+p_values_adjusted
+
+# p_values_adjusted: [1] 1.387449e-05 7.755940e-09 1.180120e-02 2.895336e-02 1.000000e+00 1.000000e+00
+
+
+#######################################
+# Maintenant la variable SchoolSup
+
+psych::describeBy()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
