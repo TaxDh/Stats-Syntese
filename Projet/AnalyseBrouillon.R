@@ -27,10 +27,6 @@ mInternet <- mathematique$internet
 pInternet <- portugais$internet
 
 #5 niveaux
-mFreeTime <- mathematique$freetime
-pFreeTime <- portugais$freetime
-
-#5 niveaux
 mDalc <- mathematique$Dalc
 PDalc <- portugais$Dalc
 
@@ -50,6 +46,13 @@ pG3 <- portugais$G3
 #dans une campagne du ministère de l'éducation
 #et peut être savoir si l'on combine plusieurs facteurs
 
+# Méthode de Bonferroni
+
+# Création de sous-ensembles pour chaque niveau de studytime
+groupe1 <- mG3[mStudyTime == 1]
+groupe2 <- mG3[mStudyTime == 2]
+groupe3 <- mG3[mStudyTime == 3]
+groupe4 <- mG3[mStudyTime == 4]
 
 
 p_values <- c(

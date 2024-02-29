@@ -71,15 +71,15 @@ print(portugais$G3[portugais$G3 >= 0 & portugais$G3 <= 5])
 ##################################################################
 #Élimination des 0 dans les données
 
-which(mathematique$G3 == 0)
-mathematique <- mathematique[mathematique$G3 != 0, ]
-which(mathematique$G3 == 0)
+which(mathematique$G3 < 6)
+mathematique <- mathematique[mathematique$G3 >= 5, ]
+which(mathematique$G3 < 5)
 which(mathematique$G2 == 0)
 which(mathematique$G1 == 0)
 
-which(portugais$G3 == 0)
-portugais <- portugais[portugais$G3 != 0, ]
-which(portugais$G3 == 0)
+which(portugais$G3 < 6)
+portugais <- portugais[portugais$G3 >= 5, ]
+which(portugais$G3 <6 )
 which(portugais$G2 == 0)
 which(portugais$G1 == 0)
 
@@ -153,7 +153,7 @@ ggstatsplot::ggbetweenstats(
 #Les variances sont clairement différentes et les n_i sont problématique, on devrait faire un test de randomisation si possible
 
 
-mathematique$logG3 <- log(mG3+2)
+mathematique$logG3 <- log(mG3)
 
 ggstatsplot::ggbetweenstats(
   data = mathematique, x = traveltime, y = logG3,
@@ -168,11 +168,37 @@ ggstatsplot::ggbetweenstats(
 
 qqnorm(mG3[mTravelTime == 1])
 qqline(mG3[mTravelTime == 1], col = "red")
+qqnorm(mG3[mTravelTime == 2])
+qqline(mG3[mTravelTime == 2], col = "red")
+qqnorm(mG3[mTravelTime == 3])
+qqline(mG3[mTravelTime == 3], col = "red")
+qqnorm(mG3[mTravelTime == 4])
+qqline(mG3[mTravelTime == 4], col = "red")
 
-#cela semble normal, faisons un test de welch pour la variable traveltime en fonction de g3
+#Les données semblent suivre une loi normales
 
-resultat_welch <- oneway.test(G3 ~ traveltime, data = mathematique, var.equal = FALSE)
-resultat_welch
+# Méthode de Bonferroni
+
+# Création de sous-ensembles pour chaque niveau de studytime
+groupe1 <- mG3[mTravelTime == 1]
+groupe2 <- mG3[mTravelTime == 2]
+groupe3 <- mG3[mTravelTime == 3]
+groupe4 <- mG3[mTravelTime == 4]
+
+p_values <- c(
+  t.test(groupe1, groupe2, var.equal = F)$p.value,
+  t.test(groupe1, groupe3, var.equal = F)$p.value,
+  t.test(groupe1, groupe4, var.equal = F)$p.value,
+  t.test(groupe2, groupe3, var.equal = F)$p.value,
+  t.test(groupe2, groupe4, var.equal = F)$p.value,
+  t.test(groupe3, groupe4, var.equal = F)$p.value
+)
+
+# Ajuster les p-valeurs pour les comparaisons multiples (Bonferroni)
+p_values_adjusted <- p.adjust(p_values, method = "bonferroni")
+
+# Afficher les résultats ajustés
+p_values_adjusted
 
 ###### pour le cours de mathématique il n'y a aucune corrélation entre le temps de voyage et la note finale G3.
 
@@ -193,7 +219,7 @@ ggstatsplot::ggbetweenstats(
   bf.message = FALSE,
 )
 
-#La variance est assez différente, surtout à cause d'une valeur aberrante, mais même en l'enlevant cela serait un problème
+#La variance est assez différente, essayons une transformation racine carré
 
 
 
@@ -208,19 +234,61 @@ ggstatsplot::ggbetweenstats(
   var.equal = F,
   bf.message = FALSE,
 )
-#une transformation racine carré ne fonctionne pas à cause du niveau 1 et de 3 valeurs aberrantes dans le niveau 1.
+#ça améliore un peu, essayons avec une transformation log, voir ce qui est le mieux
+
+portugais$logG3 <- log(portugais$G3)
+
+ggstatsplot::ggbetweenstats(
+  data = portugais, x = traveltime, y = racineG3,
+  title = "La note finale en fonction du temps de voyage",
+  mean.ci = TRUE,
+  type="p",
+  var.equal = F,
+  bf.message = FALSE,
+)
+
+#même effet que la racine carré.
 
 #Vérifions la normalité
 
-qqnorm(mG3[mTravelTime == 1])
-qqline(mG3[mTravelTime == 1], col = "red")
+qqnorm(pG3[pTravelTime == 1])
+qqline(pG3[pTravelTime == 1], col = "red")
+qqnorm(pG3[pTravelTime == 2])
+qqline(pG3[pTravelTime == 2], col = "red")
+qqnorm(pG3[pTravelTime == 3])
+qqline(pG3[pTravelTime == 3], col = "red")
+qqnorm(pG3[pTravelTime == 4])
+qqline(pG3[pTravelTime == 4], col = "red")
 
-#il y a une bonne normalité, on va donc refaire un test de welch
+#Les données semblent suivre une loi normale
 
-resultat_welch <- oneway.test(G3 ~ traveltime, data = portugais, var.equal = FALSE)
-resultat_welch
+#réutilisons la méthode de bonferonni avec un test de welch
+
+
+groupe1 <- pG3[pTravelTime == 1]
+groupe2 <- pG3[pTravelTime == 2]
+groupe3 <- pG3[pTravelTime == 3]
+groupe4 <- pG3[pTravelTime == 4]
+
+p_values <- c(
+  t.test(groupe1, groupe2, var.equal = F)$p.value,
+  t.test(groupe1, groupe3, var.equal = F)$p.value,
+  t.test(groupe1, groupe4, var.equal = F)$p.value,
+  t.test(groupe2, groupe3, var.equal = F)$p.value,
+  t.test(groupe2, groupe4, var.equal = F)$p.value,
+  t.test(groupe3, groupe4, var.equal = F)$p.value
+)
+
+# Ajuster les p-valeurs pour les comparaisons multiples (Bonferroni)
+p_values_adjusted <- p.adjust(p_values, method = "bonferroni")
+
+# Afficher les résultats ajustés
+p_values_adjusted
 
 ########### Pour le cours de français, il semble y aoir une corrélation entre le temps de voyage et la note finale G3
+#Mais cette corrélation est très faible, à peine inférieur à 0.05
+#[1] 0.40263836 0.14093051 0.04318712 1.00000000 0.25417042 1.00000000, c'est entre le groupe 1 et 4.
+#Selon le graphique, ça indiquerait que le pire temps de voyages est significatif avec le plus petit temps.
 
 ####################################################################################################################
 #Nous somme rendu à la variable StudyTime
@@ -243,8 +311,14 @@ ggstatsplot::ggbetweenstats(
 
 qqnorm(mG3[mStudyTime == 1])
 qqline(mG3[mStudyTime == 1], col = "red")
+qqnorm(mG3[mStudyTime == 2])
+qqline(mG3[mStudyTime == 2], col = "red")
+qqnorm(mG3[mStudyTime == 3])
+qqline(mG3[mStudyTime == 3], col = "red")
+qqnorm(mG3[mStudyTime == 4])
+qqline(mG3[mStudyTime == 4], col = "red")
 
-
+#les données suivent une loi normales
 
 
 # Méthode de Bonferroni
@@ -271,7 +345,7 @@ p_values_adjusted <- p.adjust(p_values, method = "bonferroni")
 # Afficher les résultats ajustés
 p_values_adjusted
 
-# p_values_adjusted: [1] 1.000000000 0.241111816 0.902398797 0.007709908 0.279629521 1.000000000
+# p_values_adjusted: [1] 1.000000000 0.241111816 0.902398797 0.009943247 0.310055949 1.000000000
 
 #il semble que le niveau 3 d'étude est différent du niveau 2
 #mais le niveau 1 ne l'est pas du niveau 3.
@@ -302,8 +376,14 @@ ggstatsplot::ggbetweenstats(
 
 qqnorm(pG3[pStudyTime == 1])
 qqline(pG3[pStudyTime == 1], col = "red")
+qqnorm(pG3[pStudyTime == 2])
+qqline(pG3[pStudyTime == 2], col = "red")
+qqnorm(pG3[pStudyTime == 3])
+qqline(pG3[pStudyTime == 3], col = "red")
+qqnorm(pG3[pStudyTime == 4])
+qqline(pG3[pStudyTime == 4], col = "red")
 
-
+#Les données semblent suivent la loi normale
 
 groupe1 <- pG3[pStudyTime == 1]
 groupe2 <- pG3[pStudyTime == 2]
@@ -326,52 +406,311 @@ p_values_adjusted <- p.adjust(p_values, method = "bonferroni")
 # Afficher les résultats ajustés
 p_values_adjusted
 
-# p_values_adjusted: [1] 1.387449e-05 7.755940e-09 1.180120e-02 2.895336e-02 1.000000e+00 1.000000e+00
+# p_values_adjusted: [1] 4.641942e-06 7.755940e-09 1.180120e-02 3.998751e-02 1.000000e+00 1.000000e+00
 
 
 #######################################
 # Maintenant la variable SchoolSup
 
-psych::describeBy()
+psych::describeBy(mG3, group = mSchoolSup)
+
+#grosse différence dans les variances
+
+ggstatsplot::ggbetweenstats(
+  data = mathematique, x = schoolsup, y = G3,
+  title = "La note finale en fonction du temps de voyage",
+  mean.ci = TRUE,
+  type="p",
+  var.equal = F,
+  bf.message = FALSE,
+)
+
+#encore une grosse différence dans les variances, essayons une racine carré
+mathematique$racineG3 <- sqrt(mathematique$G3)
+
+
+ggstatsplot::ggbetweenstats(
+  data = mathematique, x = schoolsup, y = racineG3,
+  title = "La note finale en fonction du temps de voyage",
+  mean.ci = TRUE,
+  type="p",
+  var.equal = F,
+  bf.message = FALSE,
+)
+
+#Testons la normalité
+
+qqnorm(mG3[mSchoolSup == "yes"])
+qqline(mG3[mSchoolSup == "yes"], col = "red")
+qqnorm(mG3[mSchoolSup == "no"])
+qqline(mG3[mSchoolSup == "no"], col = "red")
+
+#Les données suivent une loi normale
+
+
+#ça améliore un peu les données, faisons un test t
+
+t.test(racineG3 ~ schoolsup, data = mathematique, var.equal = T)
+
+
+#p-value = 2.831e-06, donc oui l'école en plus est très significative, mais ça n'améliore pas la note, au contraire.
+
+#------------------------
+#Maintenant portugais
+
+psych::describeBy(pG3, group = pSchoolSup)
+
+#grosse différence dans les variances
+
+ggstatsplot::ggbetweenstats(
+  data = portugais, x = schoolsup, y = G3,
+  title = "La note finale en fonction du temps de voyage",
+  mean.ci = TRUE,
+  type="p",
+  var.equal = F,
+  bf.message = FALSE,
+)
+
+#assez grosse différence dans les variances, essayons un log
+
+portugais$logG3 <- log(portugais$G3)
+
+
+ggstatsplot::ggbetweenstats(
+  data = portugais, x = schoolsup, y = logG3,
+  title = "La note finale en fonction du temps de voyage",
+  mean.ci = TRUE,
+  type="p",
+  var.equal = F,
+  bf.message = FALSE,
+)
+
+#N'améliore pas les variances
+
+
+qqnorm(pG3[pSchoolSup == "yes"])
+qqline(pG3[pSchoolSup == "yes"], col = "red")
+qqnorm(pG3[pSchoolSup == "no"])
+qqline(pG3[pSchoolSup == "no"], col = "red")
+
+#ça suit une loi normale, donc faisons un test de welch
+
+t.test(G3 ~ schoolsup, data = portugais, var.equal = F)
+
+#C'est significatif (p-value = 0.001166), mais l'aide à l'école n'aide pas vraiment les notes.
+
+
+#############################################################
+#On est rendu à la variable mFamSup
+############################################################
+
+psych::describeBy(mG3, group = mFamSup)
+
+#variance très proche, regardons visuellement
+
+
+ggstatsplot::ggbetweenstats(
+  data = mathematique, x = famsup, y = G3,
+  title = "La note finale en fonction du temps de voyage",
+  mean.ci = TRUE,
+  type="p",
+  var.equal = F,
+  bf.message = FALSE,
+)
+
+#variance très semblable aussi, vérifions la normalité
 
 
 
+qqnorm(mG3[mFamSup == "yes"])
+qqline(mG3[mFamSup == "yes"], col = "red")
+qqnorm(mG3[mFamSup == "no"])
+qqline(mG3[mFamSup == "no"], col = "red")
+
+
+#Les données suivent une loi normale, donc faisons un test t
+
+t.test(G3 ~ famsup, data = mathematique, equal.var = T)
+
+#p-value = 0.1469, donc il n'y a pas de différence avec la famille qui aide à la maison pour les math
+
+#------------------------------------------#
+# Portugais
+
+psych::describeBy(pG3, group = pFamSup)
+
+#Variance quasi identique
+
+ggstatsplot::ggbetweenstats(
+  data = portugais, x = famsup, y = G3,
+  title = "La note finale en fonction du temps de voyage",
+  mean.ci = TRUE,
+  type="p",
+  var.equal = F,
+  bf.message = FALSE,
+)
+
+#Variance quasi identique
+
+qqnorm(pG3[pFamSup == "yes"])
+qqline(pG3[pFamSup == "yes"], col = "red")
+qqnorm(pG3[pFamSup == "no"])
+qqline(pG3[pFamSup == "no"], col = "red")
+
+#suivent loi normale
+
+t.test(G3 ~ famsup, data = portugais, equal.var = T)
+
+#p-value = 0.9683, pour le portugais également, ça n'aide pas l'aide à la maison, ça ne change rien.
+
+################################################################################
+#Variable mPaid
+
+psych::describeBy(mG3, group = mPaid)
+
+#Variance très proche
+
+ggstatsplot::ggbetweenstats(
+  data = mathematique, x = paid, y = G3,
+  title = "La note finale en fonction du temps de voyage",
+  mean.ci = TRUE,
+  type="p",
+  var.equal = F,
+  bf.message = FALSE,
+)
+
+#Variance toujours très proche
+
+qqnorm(mG3[mPaid == "yes"])
+qqline(mG3[mPaid == "yes"], col = "red")
+qqnorm(mG3[mPaid == "no"])
+qqline(mG3[mPaid == "no"], col = "red")
+
+
+# Les données suivent une loi normale
+
+t.test(G3 ~ paid, data = mathematique, var.equal = T)
+
+#p-value = 0.6744, aucune différence pour mpaid
+
+psych::describeBy(pG3, group = pPaid)
+
+#Variance un peu éloigné
+
+ggstatsplot::ggbetweenstats(
+  data = portugais, x = paid, y = G3,
+  title = "La note finale en fonction du temps de voyage",
+  mean.ci = TRUE,
+  type="p",
+  var.equal = F,
+  bf.message = FALSE,
+)
+
+#Les variances sont assé éloigné
+#Essayons une racine carré
+ggstatsplot::ggbetweenstats(
+  data = portugais, x = paid, y = racineG3,
+  title = "La note finale en fonction du temps de voyage",
+  mean.ci = TRUE,
+  type="p",
+  var.equal = F,
+  bf.message = FALSE,
+)
+
+#essayons un log
+ggstatsplot::ggbetweenstats(
+  data = portugais, x = paid, y = logG3,
+  title = "La note finale en fonction du temps de voyage",
+  mean.ci = TRUE,
+  type="p",
+  var.equal = F,
+  bf.message = FALSE,
+)
+
+#aucune transformation ne fait vraiment mieux que les données sans transformations, vérifions la normalité
 
 
 
+qqnorm(pG3[pPaid == "yes"])
+qqline(pG3[pPaid == "yes"], col = "red")
+qqnorm(pG3[pPaid == "no"])
+qqline(pG3[pPaid == "no"], col = "red")
+
+#Les données suivent une loi normale
+
+t.test(G3 ~ paid, data = portugais, var.equal = F)
+# p-value = 0.05082, on pourrait rejeter le test, mais on est presque pile sur le alpha = 5%, j'irais pour un rejet
+#car les médiane sont égales et que la médiane résiste aux valeurs extrêmes, il y a aussi le fait que cela n'améliore pas
+#la moyenne de la note, au pire, si c'était significatif, paid diminue la note moyenne des étudiants.
+
+
+#############################################################
+# Variable Internet
+
+psych::describeBy(mG3, group = mInternet)
+
+#Variance proche
+
+ggstatsplot::ggbetweenstats(
+  data = mathematique, x = internet, y = G3,
+  title = "La note finale en fonction du temps de voyage",
+  mean.ci = TRUE,
+  type="p",
+  var.equal = F,
+  bf.message = FALSE,
+)
+
+#Variance proche
+
+ggstatsplot::ggbetweenstats(
+  data = mathematique, x = internet, y = logG3,
+  title = "La note finale en fonction du temps de voyage",
+  mean.ci = TRUE,
+  type="p",
+  var.equal = F,
+  bf.message = FALSE,
+)
+
+#variance encore plus proche
+
+qqnorm(mG3[mInternet == "yes"])
+qqline(mG3[mInternet == "yes"], col = "red")
+qqnorm(mG3[mInternet == "no"])
+qqline(mG3[mInternet == "no"], col = "red")
+
+
+# Les données suivent une loi normale
+
+t.test(logG3 ~ internet, data = mathematique, var.equal = T)
+
+#p-value = 0.0353, l'internet semble montré une différence, elle semble aider!
+
+psych::describeBy(pG3, group = pInternet)
+
+#Variance peu éloigné
+
+ggstatsplot::ggbetweenstats(
+  data = portugais, x = internet, y = G3,
+  title = "La note finale en fonction du temps de voyage",
+  mean.ci = TRUE,
+  type="p",
+  var.equal = F,
+  bf.message = FALSE,
+)
+
+#Les variances sont proche
+
+#vérifions la normalité
 
 
 
+qqnorm(pG3[pInternet == "yes"])
+qqline(pG3[pInternet == "yes"], col = "red")
+qqnorm(pG3[pInternet == "no"])
+qqline(pG3[pInternet == "no"], col = "red")
 
+#Les données suivent une loi normale
 
+t.test(G3 ~ internet, data = portugais, var.equal = T)
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+#p-value = 0.0009197, très significatif, l'internet semblent améliorer les notes de portugais
