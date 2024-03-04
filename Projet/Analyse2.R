@@ -1,7 +1,6 @@
 library(psych)
 library(ggstatsplot)
 
-#données: https://www.kaggle.com/datasets/uciml/student-alcohol-consumption
 mathematique <- read.table("student-mat.csv", header = T, sep = ",")
 View(mathematique)
 
@@ -12,17 +11,17 @@ dim(portugais)
 
 ######################################################################################################
 #je trouve qu'il y a vraiment trop de 0 dans les données, c'est ma démarche ici
-# Créer un histogramme pour la variable G1
+# Créer un histogramme pour la variable G3
 hist(mathematique$G1, 
-     main = "Histogramme de la variable G1",
-     xlab = "Valeurs de G1",
+     main = "Histogramme de la variable G3",
+     xlab = "Valeurs de G3",
      ylab = "Fréquence",
      col = "skyblue",
      border = "white")
-# Créer un histogramme pour la variable G1
+# Créer un histogramme pour la variable G3
 hist(mathematique$G2, 
-     main = "Histogramme de la variable G2",
-     xlab = "Valeurs de G2",
+     main = "Histogramme de la variable G3",
+     xlab = "Valeurs de G3",
      ylab = "Fréquence",
      col = "skyblue",
      border = "white")
@@ -35,17 +34,17 @@ hist(mathematique$G3,
      border = "white")
 
 
-# Créer un histogramme pour la variable G1
+# Créer un histogramme pour la variable G3
 hist(portugais$G1, 
-     main = "Histogramme de la variable G1",
-     xlab = "Valeurs de G1",
+     main = "Histogramme de la variable G3",
+     xlab = "Valeurs de G3",
      ylab = "Fréquence",
      col = "skyblue",
      border = "white")
 
 hist(portugais$G2, 
-     main = "Histogramme de la variable G2",
-     xlab = "Valeurs de G2",
+     main = "Histogramme de la variable G3",
+     xlab = "Valeurs de G3",
      ylab = "Fréquence",
      col = "skyblue",
      border = "white")
@@ -140,13 +139,11 @@ psych::describeBy(mG3, group = mTravelTime)
 
 ggstatsplot::ggbetweenstats(
   data = mathematique, x = traveltime, y = G3,
-  title = "La note finale en mathématique en fonction du temps de voyage",
+  title = "La note finale en fonction du temps de voyage",
   mean.ci = TRUE,
   type="p",
   var.equal = F,
   bf.message = FALSE,
-  results.subtitle = FALSE,
-  pairwise.comparisons = FALSE
 )
 
 
@@ -157,13 +154,11 @@ mathematique$logG3 <- log(mG3)
 
 ggstatsplot::ggbetweenstats(
   data = mathematique, x = traveltime, y = logG3,
-  title = "Le logarightme de la note finale en mathématique en fonction du temps de voyage",
+  title = "La note finale en fonction du temps de voyage",
   mean.ci = TRUE,
   type="p",
   var.equal = T,
   bf.message = FALSE,
-  results.subtitle = FALSE,
-  pairwise.comparisons = FALSE
 )
 
 #Le log n'aide pas, mais vérifions tout de même la normalité
@@ -214,13 +209,11 @@ psych::describeBy(pG3, group = pTravelTime)
 
 ggstatsplot::ggbetweenstats(
   data = portugais, x = traveltime, y = G3,
-  title = "La note finale en portugais en fonction du temps de voyage",
+  title = "La note finale en fonction du temps de voyage",
   mean.ci = TRUE,
   type="p",
   var.equal = F,
   bf.message = FALSE,
-  results.subtitle = FALSE,
-  pairwise.comparisons = FALSE
 )
 
 #La variance est assez différente, essayons une transformation racine carré
@@ -232,13 +225,11 @@ portugais$racineG3 <- sqrt(portugais$G3)
 
 ggstatsplot::ggbetweenstats(
   data = portugais, x = traveltime, y = racineG3,
-  title = "La racine carré de la note finale en portugais en fonction du temps de voyage",
+  title = "La note finale en fonction du temps de voyage",
   mean.ci = TRUE,
   type="p",
   var.equal = F,
   bf.message = FALSE,
-  results.subtitle = FALSE,
-  pairwise.comparisons = FALSE
 )
 #ça améliore un peu, essayons avec une transformation log, voir ce qui est le mieux
 
@@ -246,13 +237,11 @@ portugais$logG3 <- log(portugais$G3)
 
 ggstatsplot::ggbetweenstats(
   data = portugais, x = traveltime, y = racineG3,
-  title = "Le logarithme de la note finale en portugais en fonction du temps de voyage",
+  title = "La note finale en fonction du temps de voyage",
   mean.ci = TRUE,
   type="p",
   var.equal = F,
   bf.message = FALSE,
-  results.subtitle = FALSE,
-  pairwise.comparisons = FALSE
 )
 
 #même effet que la racine carré.
@@ -308,13 +297,11 @@ psych::describeBy(mG3, group = mStudyTime)
 
 ggstatsplot::ggbetweenstats(
   data = mathematique, x = studytime, y = G3,
-  title = "La note finale en mathématique en fonction du temps d'étude",
+  title = "La note finale en fonction du temps de voyage",
   mean.ci = TRUE,
   type="p",
   var.equal = T,
   bf.message = FALSE,
-  results.subtitle = FALSE,
-  pairwise.comparisons = FALSE
 )
 
 #Les variances sont pas mal égale, 
@@ -374,14 +361,12 @@ psych::describeBy(pG3, group = pStudyTime)
 
 
 ggstatsplot::ggbetweenstats(
-  data = portugais, x = studytime, y = G3,
-  title = "La note finale en portugais en fonction du temps d'étude",
+  data = mathematique, x = studytime, y = G3,
+  title = "La note finale en fonction du temps de voyage",
   mean.ci = TRUE,
   type="p",
   var.equal = T,
   bf.message = FALSE,
-  results.subtitle = FALSE,
-  pairwise.comparisons = FALSE
 )
 
 #Les variances sont pas mal égale, 
@@ -430,13 +415,11 @@ psych::describeBy(mG3, group = mSchoolSup)
 
 ggstatsplot::ggbetweenstats(
   data = mathematique, x = schoolsup, y = G3,
-  title = "La note finale en mathématique fonction de l'aide supplémentaire à l'école",
+  title = "La note finale en fonction du temps de voyage",
   mean.ci = TRUE,
   type="p",
   var.equal = F,
   bf.message = FALSE,
-  results.subtitle = FALSE,
-  pairwise.comparisons = FALSE
 )
 
 #encore une grosse différence dans les variances, essayons une racine carré
@@ -445,16 +428,13 @@ mathematique$racineG3 <- sqrt(mathematique$G3)
 
 ggstatsplot::ggbetweenstats(
   data = mathematique, x = schoolsup, y = racineG3,
-  title = "La racine carré de la note finale en mathématique en fonction de l'aide supplémentaire à l'école",
+  title = "La note finale en fonction du temps de voyage",
   mean.ci = TRUE,
   type="p",
   var.equal = F,
   bf.message = FALSE,
-  results.subtitle = FALSE,
-  pairwise.comparisons = FALSE
 )
 
-#ça améliore les choses
 #Testons la normalité
 
 qqnorm(mG3[mSchoolSup == "yes"])
@@ -481,13 +461,11 @@ psych::describeBy(pG3, group = pSchoolSup)
 
 ggstatsplot::ggbetweenstats(
   data = portugais, x = schoolsup, y = G3,
-  title = "La note finale en portugais en fonction de l'aide supplémentaire à l'école",
+  title = "La note finale en fonction du temps de voyage",
   mean.ci = TRUE,
   type="p",
   var.equal = F,
   bf.message = FALSE,
-  results.subtitle = FALSE,
-  pairwise.comparisons = FALSE
 )
 
 #assez grosse différence dans les variances, essayons un log
@@ -497,13 +475,11 @@ portugais$logG3 <- log(portugais$G3)
 
 ggstatsplot::ggbetweenstats(
   data = portugais, x = schoolsup, y = logG3,
-  title = "Le logarithme de la note finale en portugais en fonction de l'aide supplémentaire à l'école",
+  title = "La note finale en fonction du temps de voyage",
   mean.ci = TRUE,
   type="p",
   var.equal = F,
   bf.message = FALSE,
-  results.subtitle = FALSE,
-  pairwise.comparisons = FALSE
 )
 
 #N'améliore pas les variances
@@ -520,6 +496,16 @@ t.test(G3 ~ schoolsup, data = portugais, var.equal = F)
 
 #C'est significatif (p-value = 0.001166), mais l'aide à l'école n'aide pas vraiment les notes.
 
+t.test(G3 ~ schoolsup, data = portugais_filtered, var.equal = F)
+#En enlevant les échecs, c'est encore plus significatif, mais n'aide tjs pas
+ggstatsplot::ggbetweenstats(
+  data = portugais_filtered, x = schoolsup, y = G3,
+  title = "La note finale en fonction du temps de voyage",
+  mean.ci = TRUE,
+  type="p",
+  var.equal = F,
+  bf.message = FALSE,
+)
 
 #############################################################
 #On est rendu à la variable mFamSup
@@ -532,13 +518,11 @@ psych::describeBy(mG3, group = mFamSup)
 
 ggstatsplot::ggbetweenstats(
   data = mathematique, x = famsup, y = G3,
-  title = "La note finale en mathématique en fonction de l'aide supplémentaire apporté par la famille",
+  title = "La note finale en fonction du temps de voyage",
   mean.ci = TRUE,
   type="p",
   var.equal = F,
   bf.message = FALSE,
-  results.subtitle = FALSE,
-  pairwise.comparisons = FALSE
 )
 
 #variance très semblable aussi, vérifions la normalité
@@ -566,13 +550,11 @@ psych::describeBy(pG3, group = pFamSup)
 
 ggstatsplot::ggbetweenstats(
   data = portugais, x = famsup, y = G3,
-  title = "La note finale en portugais en fonction de l'aide supplémentaire apporté par la famille",
+  title = "La note finale en fonction du temps de voyage",
   mean.ci = TRUE,
   type="p",
   var.equal = F,
   bf.message = FALSE,
-  results.subtitle = FALSE,
-  pairwise.comparisons = FALSE
 )
 
 #Variance quasi identique
@@ -597,13 +579,11 @@ psych::describeBy(mG3, group = mPaid)
 
 ggstatsplot::ggbetweenstats(
   data = mathematique, x = paid, y = G3,
-  title = "La note finale en mathématique fonction des cours supplémentaires privés",
+  title = "La note finale en fonction du temps de voyage",
   mean.ci = TRUE,
   type="p",
   var.equal = F,
   bf.message = FALSE,
-  results.subtitle = FALSE,
-  pairwise.comparisons = FALSE
 )
 
 #Variance toujours très proche
@@ -626,38 +606,32 @@ psych::describeBy(pG3, group = pPaid)
 
 ggstatsplot::ggbetweenstats(
   data = portugais, x = paid, y = G3,
-  title = "La note finale en portugais fonction des cours supplémentaires privés",
+  title = "La note finale en fonction du temps de voyage",
   mean.ci = TRUE,
   type="p",
   var.equal = F,
   bf.message = FALSE,
-  results.subtitle = FALSE,
-  pairwise.comparisons = FALSE
 )
 
 #Les variances sont assé éloigné
 #Essayons une racine carré
 ggstatsplot::ggbetweenstats(
   data = portugais, x = paid, y = racineG3,
-  title = "La racine carré de la note finale en portugais fonction des cours supplémentaires privés",
+  title = "La note finale en fonction du temps de voyage",
   mean.ci = TRUE,
   type="p",
   var.equal = F,
   bf.message = FALSE,
-  results.subtitle = FALSE,
-  pairwise.comparisons = FALSE
 )
 
 #essayons un log
 ggstatsplot::ggbetweenstats(
   data = portugais, x = paid, y = logG3,
-  title = "Le logarithme de la note finale en portugais fonction des cours supplémentaires privés",
+  title = "La note finale en fonction du temps de voyage",
   mean.ci = TRUE,
   type="p",
   var.equal = F,
   bf.message = FALSE,
-  results.subtitle = FALSE,
-  pairwise.comparisons = FALSE
 )
 
 #aucune transformation ne fait vraiment mieux que les données sans transformations, vérifions la normalité
@@ -676,7 +650,35 @@ t.test(G3 ~ paid, data = portugais, var.equal = F)
 #car les médiane sont égales et que la médiane résiste aux valeurs extrêmes, il y a aussi le fait que cela n'améliore pas
 #la moyenne de la note, au pire, si c'était significatif, paid diminue la note moyenne des étudiants.
 
+portugais$failures
 
+# Chargement de la bibliothèque dplyr
+library(dplyr)
+
+# Filtrer les données pour enlever les lignes où paid == "yes" et failures > 0
+portugais_filtered <- portugais %>%
+  filter(!(paid == "yes" & failures > 0))
+
+portugais_filtered <- portugais_filtered %>%
+  filter(!(paid == "no" & failures > 0))
+
+# Vérifiez le résultat
+print(portugais_filtered)
+which(portugais_filtered$failures > 0)
+
+View(portugais_filtered)
+
+ggstatsplot::ggbetweenstats(
+  data = portugais_filtered, x = paid, y = G3,
+  title = "La note finale en fonction du temps de voyage",
+  mean.ci = TRUE,
+  type="p",
+  var.equal = F,
+  bf.message = FALSE,
+)
+
+t.test(G3 ~ paid, data = portugais_filtered, var.equal = F)
+#En enlevant ceux qui ont eu des échecs des 2 côtés, il n'y a plus de différence p-value = 0.08637
 #############################################################
 # Variable Internet
 
@@ -686,26 +688,22 @@ psych::describeBy(mG3, group = mInternet)
 
 ggstatsplot::ggbetweenstats(
   data = mathematique, x = internet, y = G3,
-  title = "La note finale mathématique en fonction de l'accès à l'internet à domicile",
+  title = "La note finale en fonction du temps de voyage",
   mean.ci = TRUE,
   type="p",
   var.equal = F,
   bf.message = FALSE,
-  results.subtitle = FALSE,
-  pairwise.comparisons = FALSE
 )
 
 #Variance proche
 
 ggstatsplot::ggbetweenstats(
   data = mathematique, x = internet, y = logG3,
-  title = "Le logarithme de la note finale mathématique en fonction de l'accès à l'internet à domicile",
+  title = "La note finale en fonction du temps de voyage",
   mean.ci = TRUE,
   type="p",
   var.equal = F,
   bf.message = FALSE,
-  results.subtitle = FALSE,
-  pairwise.comparisons = FALSE
 )
 
 #variance encore plus proche
@@ -728,13 +726,11 @@ psych::describeBy(pG3, group = pInternet)
 
 ggstatsplot::ggbetweenstats(
   data = portugais, x = internet, y = G3,
-  title = "La note finale en portugais en fonction de l'accès à l'internet à domicile",
+  title = "La note finale en fonction du temps de voyage",
   mean.ci = TRUE,
   type="p",
   var.equal = F,
   bf.message = FALSE,
-  results.subtitle = FALSE,
-  pairwise.comparisons = FALSE
 )
 
 #Les variances sont proche
@@ -764,24 +760,20 @@ psych::describeBy(mG3, group = mDalc)
 
 ggstatsplot::ggbetweenstats(
   data = mathematique, x = Dalc, y = G3,
-  title = "La note finale en mathématique en fonction de la consommation d'alcool les jours d'écoles",
+  title = "La note finale en fonction du temps de voyage",
   mean.ci = TRUE,
   type="p",
   var.equal = F,
   bf.message = FALSE,
-  results.subtitle = FALSE,
-  pairwise.comparisons = FALSE
 )
 
 ggstatsplot::ggbetweenstats(
   data = mathematique, x = Dalc, y = logG3,
-  title = "Le logarithme note finale en mathématique en fonction de la consommation d'alcool les jours d'écoles",
+  title = "La note finale en fonction du temps de voyage",
   mean.ci = TRUE,
   type="p",
   var.equal = F,
   bf.message = FALSE,
-  results.subtitle = FALSE,
-  pairwise.comparisons = FALSE
 )
 
 
@@ -839,26 +831,14 @@ psych::describeBy(pG3, group = PDalc)
 
 ggstatsplot::ggbetweenstats(
   data = portugais, x = Dalc, y = G3,
-  title = "La note finale en portugais en fonction de la consommation d'alcool les jours d'écoles",
+  title = "La note finale en fonction du temps de voyage",
   mean.ci = TRUE,
   type="p",
   var.equal = F,
   bf.message = FALSE,
-  results.subtitle = FALSE,
-  pairwise.comparisons = FALSE
 )
 
 
-ggstatsplot::ggbetweenstats(
-  data = portugais, x = Dalc, y = logG3,
-  title = "Le logarithme de la note finale en portugais en fonction de la consommation d'alcool les jours d'écoles",
-  mean.ci = TRUE,
-  type="p",
-  var.equal = F,
-  bf.message = FALSE,
-  results.subtitle = FALSE,
-  pairwise.comparisons = FALSE
-)
 
 #la transformation log améliore, mais pas beaucoup
 #on vérifie la normalité
@@ -915,13 +895,11 @@ psych::describeBy(mG3, group = mWalc)
 
 ggstatsplot::ggbetweenstats(
   data = mathematique, x = Walc, y = G3,
-  title = "La note finale en mathématique en fonction de la consommation d'alcool la fin de semaine",
+  title = "La note finale en fonction du temps de voyage",
   mean.ci = TRUE,
   type="p",
   var.equal = F,
   bf.message = FALSE,
-  results.subtitle = FALSE,
-  pairwise.comparisons = FALSE
 )
 
 #Les variance semblent finalement très proche
@@ -978,13 +956,11 @@ psych::describeBy(pG3, group = pWalc)
 
 ggstatsplot::ggbetweenstats(
   data = portugais, x = Walc, y = G3,
-  title = "La note finale en en portugais en fonction de la consommation d'alcool la fin de semaine",
+  title = "La note finale en fonction du temps de voyage",
   mean.ci = TRUE,
   type="p",
   var.equal = F,
   bf.message = FALSE,
-  results.subtitle = FALSE,
-  pairwise.comparisons = FALSE
 )
 
 
@@ -1028,5 +1004,17 @@ p_values_adjusted
 
 #1.0000000000 1.0000000000 0.0007616568 0.0058612511 1.0000000000 0.0127945398 0.0401602842 0.0421373683 0.0802960388
 #au moins un des groupe est différent, le groupe 1 et (1,4) et (1,5). Boire de l'alcool les fds c'est pas bon pour le portugais
+
+
+ggstatsplot::ggbetweenstats(
+  data = portugais, x = Walc, y = G3,
+  title = "La note finale en fonction du temps de voyage",
+  mean.ci = TRUE,
+  type = "p",
+  var.equal = FALSE,
+  bf.message = FALSE,
+  results.subtitle = FALSE, # Cela devrait retirer les résultats du test de Welch de l'affichage
+  pairwise.comparisons = FALSE # Cela devrait retirer les annotations des comparaisons par paires
+)
 
 

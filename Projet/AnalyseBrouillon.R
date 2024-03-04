@@ -122,3 +122,28 @@ ggstatsplot::ggbetweenstats(
 
 psych::describeBy(portugais$G3, group = portugais$Dalc)
 psych::describeBy(portugais$G3, group = portugais$Walc)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ggstatsplot::ggbetweenstats(
+  data = portugais, x = Walc, y = G3,
+  title = "La note finale en fonction du temps de voyage",
+  mean.ci = TRUE,
+  type = "p",
+  var.equal = FALSE,
+  bf.message = FALSE,
+  results.subtitle = FALSE,
+  pairwise.comparisons = FALSE
+)
