@@ -3,10 +3,10 @@ library(ggstatsplot)
 
 #données: https://www.kaggle.com/datasets/uciml/student-alcohol-consumption
 mathematique <- read.table("student-mat.csv", header = T, sep = ",")
-View(mathematique)
+#View(mathematique)
 
 portugais <- read.table("student-por.csv", header = T, sep = ",")
-View(portugais)
+#View(portugais)
 dim(portugais)
 
 
@@ -452,7 +452,7 @@ ggstatsplot::ggbetweenstats(
   bf.message = FALSE,
   results.subtitle = FALSE,
   pairwise.comparisons = FALSE
-)
+)#je n'ai pas ce graphique
 
 #ça améliore les choses
 #Testons la normalité
