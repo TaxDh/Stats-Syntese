@@ -1,0 +1,283 @@
+library(psych)
+library(ggstatsplot)
+
+#données: https://www.kaggle.com/datasets/uciml/student-alcohol-consumption
+mathematique <- read.table("student-mat.csv", header = T, sep = ",")
+#View(mathematique)
+
+portugais <- read.table("student-por.csv", header = T, sep = ",")
+#View(portugais)
+dim(portugais)
+
+
+######################################################################################################
+#je trouve qu'il y a vraiment trop de 0 dans les données, c'est ma démarche ici
+# Créer un histogramme pour la variable G1
+hist(mathematique$G1, 
+     main = "Histogramme de la variable G1",
+     xlab = "Valeurs de G1",
+     ylab = "Fréquence",
+     col = "skyblue",
+     border = "white")
+# Créer un histogramme pour la variable G1
+hist(mathematique$G2, 
+     main = "Histogramme de la variable G2",
+     xlab = "Valeurs de G2",
+     ylab = "Fréquence",
+     col = "skyblue",
+     border = "white")
+# Créer un histogramme pour la variable G3
+hist(mathematique$G3, 
+     main = "Histogramme de la variable G3",
+     xlab = "Valeurs de G3",
+     ylab = "Fréquence",
+     col = "skyblue",
+     border = "white")
+
+
+# Créer un histogramme pour la variable G1
+hist(portugais$G1, 
+     main = "Histogramme de la variable G1",
+     xlab = "Valeurs de G1",
+     ylab = "Fréquence",
+     col = "skyblue",
+     border = "white")
+
+hist(portugais$G2, 
+     main = "Histogramme de la variable G2",
+     xlab = "Valeurs de G2",
+     ylab = "Fréquence",
+     col = "skyblue",
+     border = "white")
+
+hist(portugais$G3, 
+     main = "Histogramme de la variable G3",
+     xlab = "Valeurs de G3",
+     ylab = "Fréquence",
+     col = "skyblue",
+     border = "white")
+
+
+print(mathematique$G3[mathematique$G3 >= 0 & mathematique$G3 <= 5])
+print(mathematique$G2[mathematique$G2 >= 0 & mathematique$G2 <= 5])
+print(mathematique$G1[mathematique$G1 >= 0 & mathematique$G1 <= 5])
+print(portugais$G1[portugais$G1 >= 0 & portugais$G1 <= 5])
+print(portugais$G2[portugais$G2 >= 0 & portugais$G2 <= 5])
+print(portugais$G3[portugais$G3 >= 0 & portugais$G3 <= 5])
+
+#Fin de la démarche pour les 0, on va éliminer les 0 des données
+###################################################################
+
+
+##################################################################
+#Élimination des 0 dans les données
+
+which(mathematique$G3 < 6)
+mathematique <- mathematique[mathematique$G3 >= 5, ]
+which(mathematique$G3 < 5)
+which(mathematique$G2 == 0)
+which(mathematique$G1 == 0)
+
+which(portugais$G3 < 6)
+portugais <- portugais[portugais$G3 >= 5, ]
+which(portugais$G3 <6 )
+which(portugais$G2 == 0)
+which(portugais$G1 == 0)
+
+#which(portugais$difference >= 6)
+#portugais <- portugais[portugais$difference >= 6, ]
+
+#Fin de l'élimination des 0 dans les données
+##############################################
+
+##############################################
+mTravelTime <- mathematique$traveltime
+pTravelTime <- portugais$traveltime
+
+mStudyTime <- mathematique$studytime
+pStudyTime <- portugais$studytime
+
+mFailures <- mathematique$failures
+pFailures <- portugais$failures
+
+mSchoolSup <- mathematique$schoolsup
+pSchoolSup <- portugais$schoolsup
+
+mFamSup <- mathematique$famsup
+pFamSup <- portugais$famsup
+
+mPaid <- mathematique$paid
+pPaid <- portugais$paid
+
+mInternet <- mathematique$internet
+pInternet <- portugais$internet
+
+mFreeTime <- mathematique$freetime
+pFreeTime <- portugais$freetime
+
+mDalc <- mathematique$Dalc
+PDalc <- portugais$Dalc
+
+mWalc <- mathematique$Walc
+pWalc <- portugais$Walc
+
+mG3 <- mathematique$G3
+pG3 <- portugais$G3
+
+
+##############################################
+
+mathematique$difference <- mathematique$G3 - mathematique$G1
+
+ggstatsplot::ggbetweenstats(
+  data = mathematique, x = traveltime, y = difference,
+  title = "La note finale en mathématique en fonction du temps de voyage",
+  mean.ci = TRUE,
+  type="p",
+  var.equal = T,
+  bf.message = FALSE,
+)
+
+ggstatsplot::ggbetweenstats(
+  data = mathematique, x = studytime, y = difference,
+  title = "La note finale en mathématique en fonction du temps de voyage",
+  mean.ci = TRUE,
+  type="p",
+  var.equal = T,
+  bf.message = FALSE,
+)
+
+
+ggstatsplot::ggbetweenstats(
+  data = mathematique, x = schoolsup, y = difference,
+  title = "La note finale en mathématique en fonction du temps de voyage",
+  mean.ci = TRUE,
+  type="p",
+  var.equal = T,
+  bf.message = FALSE,
+)
+
+ggstatsplot::ggbetweenstats(
+  data = mathematique, x = famsup, y = difference,
+  title = "La note finale en mathématique en fonction du temps de voyage",
+  mean.ci = TRUE,
+  type="p",
+  var.equal = T,
+  bf.message = FALSE,
+)
+
+ggstatsplot::ggbetweenstats(
+  data = mathematique, x = paid, y = difference,
+  title = "La note finale en mathématique en fonction du temps de voyage",
+  mean.ci = TRUE,
+  type="p",
+  var.equal = T,
+  bf.message = FALSE,
+)
+
+ggstatsplot::ggbetweenstats(
+  data = mathematique, x = internet, y = difference,
+  title = "La note finale en mathématique en fonction du temps de voyage",
+  mean.ci = TRUE,
+  type="p",
+  var.equal = T,
+  bf.message = FALSE,
+)
+
+ggstatsplot::ggbetweenstats(
+  data = mathematique, x = Dalc, y = difference,
+  title = "La note finale en mathématique en fonction du temps de voyage",
+  mean.ci = TRUE,
+  type="p",
+  var.equal = T,
+  bf.message = FALSE,
+)
+
+ggstatsplot::ggbetweenstats(
+  data = mathematique, x = Walc, y = difference,
+  title = "La note finale en mathématique en fonction du temps de voyage",
+  mean.ci = TRUE,
+  type="p",
+  var.equal = T,
+  bf.message = FALSE,
+)
+
+##################################################################
+#portugais
+##################################################################
+
+portugais$difference <- portugais$G3 - portugais$G1
+
+ggstatsplot::ggbetweenstats(
+  data = portugais, x = traveltime, y = difference,
+  title = "La note finale en mathématique en fonction du temps de voyage",
+  mean.ci = TRUE,
+  type="p",
+  var.equal = F,
+  bf.message = FALSE,
+)
+
+ggstatsplot::ggbetweenstats(
+  data = portugais, x = studytime, y = difference,
+  title = "La note finale en mathématique en fonction du temps de voyage",
+  mean.ci = TRUE,
+  type="p",
+  var.equal = T,
+  bf.message = FALSE,
+)
+
+
+ggstatsplot::ggbetweenstats(
+  data = portugais, x = schoolsup, y = difference,
+  title = "La note finale en mathématique en fonction du temps de voyage",
+  mean.ci = TRUE,
+  type="p",
+  var.equal = T,
+  bf.message = FALSE,
+)
+
+ggstatsplot::ggbetweenstats(
+  data = portugais, x = famsup, y = difference,
+  title = "La note finale en mathématique en fonction du temps de voyage",
+  mean.ci = TRUE,
+  type="p",
+  var.equal = T,
+  bf.message = FALSE,
+)
+
+ggstatsplot::ggbetweenstats(
+  data = portugais, x = paid, y = difference,
+  title = "La note finale en mathématique en fonction du temps de voyage",
+  mean.ci = TRUE,
+  type="p",
+  var.equal = T,
+  bf.message = FALSE,
+)
+
+ggstatsplot::ggbetweenstats(
+  data = portugais, x = internet, y = difference,
+  title = "La note finale en mathématique en fonction du temps de voyage",
+  mean.ci = TRUE,
+  type="p",
+  var.equal = T,
+  bf.message = FALSE,
+)
+
+ggstatsplot::ggbetweenstats(
+  data = portugais, x = Dalc, y = difference,
+  title = "La note finale en mathématique en fonction du temps de voyage",
+  mean.ci = TRUE,
+  type="p",
+  var.equal = T,
+  bf.message = FALSE,
+)
+
+ggstatsplot::ggbetweenstats(
+  data = portugais, x = Walc, y = difference,
+  title = "La note finale en mathématique en fonction du temps de voyage",
+  mean.ci = TRUE,
+  type="p",
+  var.equal = T,
+  bf.message = FALSE,
+)
+
