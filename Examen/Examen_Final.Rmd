@@ -1,0 +1,233 @@
+---
+title: "Examen Final"
+output: html_document
+date: "2024-04-18"
+---
+
+
+
+```{r}
+load("C:/Users/kf891141/Desktop/Examen/Mandragore.Rdata")
+```
+
+```{r}
+attach(mandragore)
+```
+
+
+```{r}
+dim(mandragore)
+```
+
+
+# Question 1
+
+## a) Représentations graphiques
+
+On vérifie que les 2 variables (hemisphere et Zik) ont bien un effet individuellement
+```{r}
+ggstatsplot::ggbetweenstats(
+data = mandragore, x = Hemisphere, y = Hauteur,
+title = "Hauteur ~ Hemisphere",
+mean.ci = TRUE,
+type="p",
+var.equal = F,
+bf.message = FALSE,
+)
+```
+```{r}
+ggstatsplot::ggbetweenstats(
+data = mandragore, x = Zik, y = Hauteur,
+title = "Hauteur ~ Engrais",
+mean.ci = TRUE,
+type="p",
+var.equal = F,
+bf.message = FALSE,
+)
+```
+
+On devrait transformer hauteur en log(hateur)
+
+```{r}
+mandragore$logHauteur <- log(Hauteur)
+
+ggstatsplot::ggbetweenstats(
+data = mandragore, x = Zik, y = logHauteur,
+title = "Hauteur ~ Engrais",
+mean.ci = TRUE,
+type="p",
+var.equal = F,
+bf.message = FALSE,
+)
+
+ggstatsplot::ggbetweenstats(
+data = mandragore, x = Hemisphere, y = logHauteur,
+title = "Hauteur ~ Hemisphere",
+mean.ci = TRUE,
+type="p",
+var.equal = F,
+bf.message = FALSE,
+)
+```
+
+Les variances des logHauteurs sont respectés (égales) pour les 2 variables.
+
+```{r}
+attach(mandragore)
+model <- lm(logHauteur ~ Hemisphere + Zik, data = mandragore)
+```
+
+
+```{r}
+par(mfrow = c(1,2))
+plot(Hemisphere, logHauteur); R <- lm(logHauteur ~ Hemisphere); abline(R, col = "red3")
+plot(Zik, logHauteur); R <- lm(logHauteur ~ Zik); abline(R, col = "red3")
+```
+
+On semble avoir une relation similaire pour les 2, où le non a le même effet que le nord et le oui le même que le sud.
+
+
+## b et c
+
+plot de aov1 permet de tester les postulats de l'anova
+
+```{r}
+aov1 = aov(lm(logHauteur ~ Hemisphere*Zik))
+plot(aov1)
+```
+
+
+
+
+
+On voit que pour les 2 variables, les qq-plots des résidus suivent la loi normale et les graphiques "residus vs fitted" ont une variance égale. Donc nous pouvons utilisé une ANOVA.
+
+
+Nous allons utilisé plus exactement une analyse de covariance pour vérifier l'interaction entre hemisphère et Zik (l'engrais). Le $\alpha$ = 0.05 et on suppose comme hypothèse nulle que l'effet de l'hemisphère et de l'engrais (Zik) sera non significatif.
+
+```{r}
+anova(aov1)
+```
+
+On obtiens une interaction bien inférieur à 0.05 (notre $\alpha$) donc il y a bien 
+
+## d)
+
+Au vu de notre analyse, la valeur-p de l'intéraction entre l'hemisphère et le choix de l'engrais Zik pour la hauteur de la plante est bien inférieur au seuil $\alpha = 0.05$, ce qui signifie que l'on peut rejeter l'hypothèse nulle et considérer que l'intéraction est significative. Par contre, en regardant bien le tableau de l'analyse de variance, on remarque que l'hemisphere seul ou le choix de l'engrais (Zik) est déjà très significatif! Ce qui pourrais biaisé notre analyse. En effet, si ces deux prédicteurs sont déjà significatif, il est très peu probable que l'intéraction ne le soit pas. En plus, on a vu dans les graphiques plus haut que leur effet est très semblable (l'hémisphere sud et l'utilisation de la Zik donne le même effet sur la hauteur des plantes). Donc, selon notre analyse, l'intéraction a un effet, mais nous ne pouvons être certain que ce n'est pas simplement l'effet des prédicteurs eux-mêmes que nous observons.
+
+
+
+# Question 2
+
+```{r}
+library(plyr)
+mandragore$Zik <- revalue(mandragore$Zik, c("Oui"=1))
+mandragore$Zik <- revalue(mandragore$Zik, c("Non"=0))
+head(mandragore$Zik)
+class(mandragore$Zik); attach(mandragore)
+
+```
+Petite transformation pour avoir des 0 et 1.
+
+```{r}
+poidsOui <- mandragore$Poids[which(mandragore$Zik == 1)]
+hauteurOui <- mandragore$Hauteur[which(mandragore$Zik == 1)]
+
+poidsNon <- mandragore$Poids[which(mandragore$Zik == 0)]
+hauteurNon <- mandragore$Hauteur[which(mandragore$Zik == 0)]
+length(poidsOui); length(poidsNon); length(hauteurOui); length(hauteurNon) 
+```
+
+
+## a)
+
+
+
+```{r}
+plot(hauteurOui, poidsOui); R <- lm(poidsOui ~ hauteurOui); abline(R, col = "red3")
+
+plot(hauteurOui, poidsOui, xlim=c(0,5),ylim=c(0,20)); R <- lm(poidsOui ~ hauteurOui); abline(R, col = "red3")
+```
+La droite de régression linéaire semble être bonne, par contre il est difficile d'évaluer avec autant de donnée à une hauteure inférieure à 3.
+
+
+```{r}
+plot(hauteurNon, poidsNon); R <- lm(poidsNon ~ hauteurNon); abline(R, col = "red3")
+
+plot(hauteurNon, poidsNon, xlim=c(0,12),ylim=c(0,350)); R <- lm(poidsNon ~ hauteurNon); abline(R, col = "red3")
+
+
+```
+La régression semble être bonne aussi, mais il y a une beaucoup plus grande dispersion des données.
+
+Quand on compare les 2e graphiques (pour faire une comparaison plus à l'échelle), on remarque que la dispersion des données est respectés. Donc on peut conclure que l'égalité des variances est respectées.
+
+
+## b)
+
+Vu que notre modèle possède une variable catégorielle et une numérique (comme prédicteur), nous allons utilisé l'analyse de covariance comme test statistique.
+
+## c) et d)
+
+```{r}
+aov2 = aov(lm(poidsOui ~ hauteurOui))
+plot(aov2)
+
+aov3 = aov(lm(poidsNon ~ hauteurNon))
+plot(aov3)
+```
+Les résidus des 2 relations semblent suivre une loi normale, donc ce postulat est respecté. Par contre ils n'y a pas d'égalité des variances des résidus...
+
+Pour remédier à l'inégalité des variances des résidus, on va tenter une transformation logarithmique:
+
+```{r}
+logPoidsNon <- log(poidsNon)
+logPoidsOui <- log(poidsOui)
+
+aov2 = aov(lm(logPoidsOui ~ hauteurOui))
+plot(aov2)
+
+aov3 = aov(lm(logPoidsNon ~ hauteurNon))
+plot(aov3)
+```
+Ça ne s'améliore pas vraiment, nous allons tenté une transformation box-cox.
+
+```{r}
+library(MASS)
+boxc <- boxcox(poidsOui ~ hauteurOui)
+(lambda <- boxc$x[which.max(boxc$y)])
+
+poidsOuiB <- (poidsOui^lambda - 1) / lambda
+
+boxc <- boxcox(poidsNon ~ hauteurNon)
+(lambda <- boxc$x[which.max(boxc$y)])
+
+poidsNonB <- (poidsNon^lambda - 1) / lambda
+```
+ça semble avoir fonctionné, vérifions:
+
+```{r}
+aov2 = aov(lm(poidsOuiB ~ hauteurOui))
+plot(aov2)
+
+aov3 = aov(lm(poidsNonB ~ hauteurNon))
+plot(aov3)
+```
+
+La variance des résidus c'est amélioré, mais pas beaucoup. Nous allons choisir que nous acceptons ce postulat comme étant respecté.
+
+
+Nous faisons les 2 anova, une avec l'engrais et l'autre sans l'engrais
+```{r}
+library(car)
+m1.1 <- lm(poidsOuiB ~ hauteurOui); m1.1 <- lm(poidsOuiB ~ hauteurOui)
+Anova(m1.1, type = "II")
+
+m2.1 <- lm(poidsNonB ~ hauteurNon); m1.2 <- lm(poidsNonB ~ hauteurNon)
+Anova(m2.1, type = "II")
+```
+Nous utilisons un $\alpha = 0.05$ et un $H_0$: la hauteur n'influence pas la moyenne des poids, contre $H_1$: la hauteur influence la moyenne des poids.
+
+Nous voyons ici dans les 2 tables d'anova (type II tests) qu'avec ou sans l'engrais (Zik), la p-valeur est bien inférieur à $\alpha$. Ce qui nous donne que le poids est influencé par la hauteure. Par contre, on ne peut vérifier si l'engrais à un effet où non, vu qu'avec ou sans engrais, la relation entre le poids et la hauteure est significative.
+
+
