@@ -324,3 +324,25 @@ qqPlot(model1B.y$residuals,pch=20)
 shapiro.test(residuals(model1B.y))
 # c'est ok W = 0.99515, p-value = 0.3667
 
+dwtest(model1B.y)
+# DW = 2.0743, p-value = 0.7465 - Ok!
+
+Anova(model1B.y, type = "II")
+
+
+# observer les 2 graphiques intéractions
+
+
+
+
+
+
+
+
+
+
+
+
+#############################################################################
+# diff.y!
+
