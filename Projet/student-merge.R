@@ -25,7 +25,7 @@ head(d3)
 
 
 # Étape 1 : Relire le fichier CSV
-d3_read <- read.table("sudent-mat_por.csv" ,sep=",", header = TRUE)
+d3_read <- read.table("student-mat_por.csv" ,sep=",", header = TRUE)
 
 # Étape 2 : Vérifier les dimensions
 dim(d3_read)
