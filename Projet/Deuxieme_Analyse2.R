@@ -74,8 +74,7 @@ donnees$boxcoxG3.x <- (donnees$G3.x^best_lambda - 1) / best_lambda
 model1B <- lm(boxcoxG3.x ~ traveltime.x + studytime.x + schoolsup.x + famsup.x + paid.x + internet + Dalc.x + Walc.x, data = donnees)
 
 # On vérifie la normalité des résidus
-qqnorm(residuals(model1B))
-qqline(residuals(model1B), col = "red")
+qqPlot(model1B$residuals,pch=20)
 # Respecte la normalité
 
 # On doit vérifier la variance des résidus
@@ -86,7 +85,7 @@ attach(donnees)
 
 
 plot(model1B, which = 1)
-qqPlot(model1B$residuals,pch=20)
+
 
 par(mfrow=c(2,2))
 
@@ -168,4 +167,160 @@ ggplot(donnees, aes(x=studytime.x, y=boxcoxG3.x, color=famsup.x)) +
 
 model2 <- lm(diff.x ~ (traveltime.x + studytime.x + schoolsup.x + famsup.x + paid.x + internet + Dalc.x + Walc.x)^2, data = donnees)
 
+# Vérification de la linéarité et homoscédasticité
+plot(model2, which = 1)
+# C'est à peu près linéaire et ça respecte l'homooscédasticité
+
+# vérifie la normalité des résidus
+qqPlot(model2$residuals,pch=20)
+# Les résidus suivent la loi normale.
+
+# 2e test pour s'en assurer
+shapiro.test(residuals(model2))
+# W = 0.99278, p-value = 0.1004, W proche de 1 veut dire proche loi normale
+# p-value > 0.05 veut dire qu'on ne peut pas rejeter l'hypothese nulle que les résidus sont normale
+
+dwtest(model2)
+# tout va bien, pas besoin de changement de variable
+
+# On procède à l'Anova
+
+Anova(model2, type = "II")
+
+
+# Observons l'effet de ces intéraction pour être certain que c'est une intéraction positive
+
+donnees$studytime.x <- as.factor(donnees$studytime.x)
+
+# Interaction entre traveltime.x et studytime.x
+ggplot(donnees, aes(x=traveltime.x, y=diff.x, color=studytime.x)) +
+  geom_point() +
+  geom_smooth(method="lm", se=FALSE, aes(group=studytime.x)) +
+  labs(title="Interaction entre Temps de Voyage et Temps d'Étude avec Différence de Notes",
+       x="Temps de Voyage",
+       y="Différence de Notes") +
+  scale_color_manual(values=c("blue", "red", "green", "orange")) +
+  theme_minimal()
+# Moins il y a de temps de voyage et plus de temps d'étude, mieux c'est
+
+donnees$schoolsup.x <- factor(donnees$schoolsup.x)
+
+# Interaction entre traveltime.x et schoolsup.x
+ggplot(donnees, aes(x=traveltime.x, y=diff.x, color=schoolsup.x)) +
+  geom_point() +
+  geom_smooth(method="lm", se=FALSE, aes(group=schoolsup.x)) +
+  labs(title="Interaction entre Temps de Voyage et Support Scolaire avec Différence de Notes",
+       x="Temps de Voyage",
+       y="Différence de Notes") +
+  scale_color_manual(values=c("blue", "red")) +
+  theme_minimal()
+# On voit ici que plus le temps de voyage est grand avec l'aide supplémentaire à l'école, mieux c'est...
+# mais sans aide supplémentaire, c'est pire...
+
+donnees$Walc.x <- factor(donnees$Walc.x)
+
+# Interaction entre traveltime.x et Walc.x
+ggplot(donnees, aes(x=traveltime.x, y=diff.x, color=Walc.x)) +
+  geom_point() +
+  geom_smooth(method="lm", se=FALSE, aes(group=Walc.x)) +
+  labs(title="Interaction entre Temps de Voyage et Consommation d'Alcool le Week-End avec Différence de Notes",
+       x="Temps de Voyage",
+       y="Différence de Notes") +
+  scale_color_manual(values=c("blue", "red","black","orange", "green")) +
+  theme_minimal()
+# si tu bois bcp et que tu as un long temps de voyage, ta note montera...
+
+donnees$famsup.x <- factor(donnees$famsup.x)
+# Interaction entre traveltime.x et schoolsup.x
+ggplot(donnees, aes(x=schoolsup.x, y=diff.x, color=famsup.x)) +
+  geom_point() +
+  geom_smooth(method="lm", se=FALSE, aes(group=famsup.x)) +
+  labs(title="Interaction entre Temps de Voyage et Support Scolaire avec Différence de Notes",
+       x="Temps de Voyage",
+       y="Différence de Notes") +
+  scale_color_manual(values=c("blue", "red")) +
+  theme_minimal()
+# Support familiale & support scolaire n'aide pas
+# pas de support familiale et support scolaire aide...
+
+donnees$Dalc.x <- factor(donnees$Dalc.x)
+
+# Interaction entre traveltime.x et Walc.x
+ggplot(donnees, aes(x=schoolsup.x, y=diff.x, color=Dalc.x)) +
+  geom_point() +
+  geom_smooth(method="lm", se=FALSE, aes(group=Dalc.x)) +
+  labs(title="Interaction entre Temps de Voyage et Consommation d'Alcool le Week-End avec Différence de Notes",
+       x="Temps de Voyage",
+       y="Différence de Notes") +
+  scale_color_manual(values=c("blue", "red","black","orange", "green")) +
+  theme_minimal()
+# la seule combinaison positive est faible consommation et support à l'école
+
+ggplot(donnees, aes(x=internet, y=diff.x, color=Dalc.x)) +
+  geom_point() +
+  geom_smooth(method="lm", se=FALSE, aes(group=Dalc.x)) +
+  labs(title="Interaction entre Temps de Voyage et Consommation d'Alcool le Week-End avec Différence de Notes",
+       x="Temps de Voyage",
+       y="Différence de Notes") +
+  scale_color_manual(values=c("blue", "red","black","orange", "green")) +
+  theme_minimal()
+# Tout augmente la note (internet + consommation, mais moins tu consommes c'est mieux)
+
+
+ggplot(donnees, aes(x=internet, y=diff.x, color=Walc.x)) +
+  geom_point() +
+  geom_smooth(method="lm", se=FALSE, aes(group=Walc.x)) +
+  labs(title="Interaction entre Temps de Voyage et Consommation d'Alcool le Week-End avec Différence de Notes",
+       x="Temps de Voyage",
+       y="Différence de Notes") +
+  scale_color_manual(values=c("blue", "red","black","orange", "green")) +
+  theme_minimal()
+# Avoir internet augmente ta note seulement si tu bois niv 1-2-3
+
+
+
+####################################################################
+# Portugais!!!!
+
+model1.y <- lm(G3.y ~ (traveltime.y + studytime.y + schoolsup.y + famsup.y + paid.y + internet + Dalc.y + Walc.y)^2, data = donnees)
+
+# on vérifie les 3 postulats
+
+# Vérification de la linéarité et homoscédasticité (égalité des variances des résidus)
+plot(model1.y, which = 1)
+
+# vérifie la normalité des résidus
+qqPlot(model1.y$residuals,pch=20)
+
+# 2e test pour s'en assurer
+shapiro.test(residuals(model1.y))
+# Le test de shapiro et la forme de cone dans le plot(model1.y, which = 1) nous confirme qu'il faut faire un changement de variable
+# On va tenter boxcox
+
+dwtest(model1.y)
+
+
+# Transformation de boxcox
+
+bc_result <- boxcox(model1.y, lambda = seq(-2, 2, by = 0.1))
+
+# Trouver la valeur de lambda qui maximise la log-vraisemblance
+(best_lambda <- bc_result$x[which.max(bc_result$y)])
+
+# Appliquer la transformation Box-Cox à G3.x
+donnees$boxcoxG3.y <- (donnees$G3.y^best_lambda - 1) / best_lambda
+
+model1B.y <- lm(boxcoxG3.y ~ (traveltime.y + studytime.y + schoolsup.y + famsup.y + paid.y + internet + Dalc.y + Walc.y)^2, data = donnees)
+
+# Vérification de la linéarité et homoscédasticité (égalité des variances des résidus)
+plot(model1B.y, which = 1)
+#Il semble y avoir la même forme, mais c'est peu prononcé
+
+# vérifie la normalité des résidus
+qqPlot(model1B.y$residuals,pch=20)
+# semble ok
+
+# 2e test pour s'en assurer
+shapiro.test(residuals(model1B.y))
+# c'est ok W = 0.99515, p-value = 0.3667
 
