@@ -57,7 +57,7 @@ qqPlot(model1$residuals,pch=20)# model1B
 shapiro.test(residuals(model1))
 # W = 0.99339, p-value = 0.1417, W proche de 1 veut dire proche loi normale
 # p-value > 0.05 veut dire qu'on ne peut pas rejeter l'hypothese nulle que les résidus sont normale
-
+dwtest(model1)
 
 # On sait déjà par la première partie que les variances sont inégales
 
@@ -335,7 +335,7 @@ ggplot(donnees, aes(x=traveltime.y, y=G3.y, color=Dalc.y)) +
 donnees$famsup.y <- as.factor(donnees$famsup.y)
 
 
-ggplot(donnees, aes(x=internet, y=diff.x, color=famsup.y)) +
+ggplot(donnees, aes(x=internet, y=G3.y, color=famsup.y)) +
   geom_point() +
   geom_smooth(method="lm", se=FALSE, aes(group=famsup.y)) +
   labs(title="Interaction entre la posession d'internet et le support familiale avec Différence de Notes",
